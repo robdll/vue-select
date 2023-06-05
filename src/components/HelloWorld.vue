@@ -1,45 +1,91 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <header>
+      MY Configuration
+    </header>
+    <section>
+      <form>
+        <h3>title</h3>
+        <p>paragraph</p>
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" v-model="selectAll" @click="toggleAll"></th>
+              <th>Select All</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="field in fields" :key="field.name">
+              <td><input type="checkbox" v-model="field.selected" @change=toggleField></td>
+              <td>{{field.name}}</td>
+              <td v-html="field.description"></td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+      <button @click="showFields">Save</button>
+    </section>
   </div>
 </template>
 
+
 <script>
+import { toRaw } from 'vue';
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
+  data() {
+    return {
+      fields: [{
+        selected: false,
+        name: 'field Name 1',
+        description: 'field description 1',
+      },
+      {
+        selected: false,
+        name: 'field Name 3',
+        description: 'field description 2',
+      },
+      {
+        selected: false,
+        name: 'field Name 3',
+        description: 'field description 3',
+      }
+    ],
+      selectAll: false,
+    };
+  },
+  computed: {
+    amountSelected() {
+      const selectedFields = this.fields.filter((field) => field.selected).length;
+      if (!selectedFields) return 'none';
+      if (selectedFields === Object.keys(this.fields).length) return 'all';
+      return 'some';
+    }
+  },
+  methods: {
+    toggleAll() {
+      const newStatus = !this.areAllFieldsSelected();
+      for (const field of this.fields) {
+        field.selected = newStatus;
+      }
+      this.selectAll = newStatus;
+    },
+    toggleField() {
+      this.selectAll = this.areAllFieldsSelected();
+    },
+    areAllFieldsSelected() {
+      console.log(toRaw(this.fields))
+      return this.fields.every((field) => field.selected);
+    },
+    showFields() {
+      const selectedFields = this.fields.filter((field) => field.selected);
+      console.log(selectedFields, this.selectAll);
+    }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;
